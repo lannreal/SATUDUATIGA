@@ -283,13 +283,41 @@
                 catch (e) { result = await response.text(); }
 
                 if (response.ok) {
-                    showMessage("VERIFIKASI BERHASIL! VIP telah diklaim.", "success", result);
+                    if (result.job_id) {
+                        showMessage("Job diterima. Memantau status proses di server...", "info");
+                        let isDone = false;
+                        while (!isDone) {
+                            await new Promise(r => setTimeout(r, 3000));
+                            try {
+                                const jobRes = await fetch(`${BASE_URL}/api/result/${result.job_id}`);
+                                const jobData = await jobRes.json();
+                                if (jobData.data && jobData.data.status !== 'processing') {
+                                    isDone = true;
+                                    if (jobData.data.success) {
+                                        showMessage("VERIFIKASI BERHASIL! VIP telah diklaim.", "success", jobData.data);
+                                    } else {
+                                        showMessage("PROSES VIP GAGAL!", "error", jobData.data);
+                                    }
+                                    setLoading('btnVerify', false, 'Verifikasi & Bypass');
+                                } else {
+                                    showMessage("Sedang diproses oleh server, mohon tunggu... (loading)", "info");
+                                }
+                            } catch (err) {
+                                isDone = true;
+                                showMessage(`Gagal mengecek status: ${err.message}`, "error");
+                                setLoading('btnVerify', false, 'Verifikasi & Bypass');
+                            }
+                        }
+                    } else {
+                        showMessage("VERIFIKASI BERHASIL! VIP telah diklaim.", "success", result);
+                        setLoading('btnVerify', false, 'Verifikasi & Bypass');
+                    }
                 } else {
                     showMessage("VERIFIKASI GAGAL!", "error", result);
+                    setLoading('btnVerify', false, 'Verifikasi & Bypass');
                 }
             } catch (error) {
                 showMessage(`Terjadi kesalahan jaringan/sistem: ${error.message}`, "error");
-            } finally {
                 setLoading('btnVerify', false, 'Verifikasi & Bypass');
             }
         }

@@ -91,15 +91,53 @@ async function main() {
             verifyResult = await verifyResponse.text();
         }
 
-        // 5. Menampilkan hasil verifikasi
+        // 5. Menampilkan hasil verifikasi awal dan Polling Job
         console.log("==========================================");
         if (verifyResponse.ok) {
-            console.log("    [+] VERIFIKASI BERHASIL! [+]");
+            console.log("    [+] JOB VERIFIKASI DITERIMA [+]");
             console.log("==========================================");
-            console.log("Detail Respons:");
-            console.dir(verifyResult, { depth: null, colors: true });
+            console.log("Pesan Server:", verifyResult.message || "Sedang memproses...");
+            
+            // Jika ada jobId, kita lakukan polling (ngecek terus ke server)
+            if (verifyResult.job_id) {
+                console.log(`\n[*] Memantau status Job ID: ${verifyResult.job_id}`);
+                process.stdout.write("[*] Loading");
+                
+                let isDone = false;
+                while (!isDone) {
+                    await new Promise(r => setTimeout(r, 3000)); // Jeda 3 detik
+                    
+                    try {
+                        const jobRes = await fetch(`${BASE_URL}/api/result/${verifyResult.job_id}`);
+                        const jobData = await jobRes.json();
+                        
+                        // Cek apakah status sudah berubah dari processing
+                        if (jobData.data && jobData.data.status !== 'processing') {
+                            isDone = true;
+                            console.log("\n\n==========================================");
+                            if (jobData.data.success) {
+                                console.log("    [+] PROSES VIP BERHASIL! [+]");
+                            } else {
+                                console.log("    [-] PROSES VIP GAGAL! [-]");
+                            }
+                            console.log("==========================================");
+                            console.log("Detail Akhir:");
+                            console.dir(jobData.data, { depth: null, colors: true });
+                        } else {
+                            // Tampilkan titik-titik indikator loading
+                            process.stdout.write(".");
+                        }
+                    } catch (err) {
+                        isDone = true;
+                        console.log("\n[!] Gagal mengecek status job:", err.message);
+                    }
+                }
+            } else {
+                // Jika tidak ada job_id, langsung tampilkan
+                console.dir(verifyResult, { depth: null, colors: true });
+            }
         } else {
-            console.log("    [-] VERIFIKASI GAGAL! [-]");
+            console.log("    [-] VERIFIKASI DITOLAK! [-]");
             console.log("==========================================");
             console.log(`Status HTTP: ${verifyResponse.status}`);
             console.log("Detail Respons:");
