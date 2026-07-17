@@ -69,6 +69,7 @@ async function simulateMouse(page) {
   } catch (e) {}
 }
 
+
 async function isChallenging(page) {
   try {
     const title = (await page.title()).toLowerCase();
@@ -83,7 +84,10 @@ async function isChallenging(page) {
       title.includes('cloudflare'),
       url.includes('/cdn-cgi/challenge-platform'),
       url.includes('challenge'),
-      bodyText.includes('checking if the site connection is secure'),
+      bodyText.toLowerCase().includes('checking if the site connection is secure'),
+      bodyText.toLowerCase().includes('performing security verification'),
+      bodyText.toLowerCase().includes('verifies you are not a bot'),
+      bodyText.toLowerCase().includes('security service to protect against malicious bots')
     ];
     return cfSignals.some(Boolean);
   } catch {
