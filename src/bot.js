@@ -481,7 +481,13 @@ let currentSession = null;
                     let cleanFetch = ifr.contentWindow.fetch;
                     let r = await cleanFetch('/api/auth/send-magic-link', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json, text/plain, */*',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Origin': window.location.origin,
+                            'Referer': window.location.href
+                        },
                         credentials: 'include',
                         body: JSON.stringify({ email })
                     });
@@ -584,7 +590,13 @@ let currentSession = null;
                               let cleanFetch = ifr.contentWindow.fetch;
                               const res = await cleanFetch('/api/auth/verify-magic-link', {
                                   method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
+                                  headers: { 
+                                      'Content-Type': 'application/json',
+                                      'Accept': 'application/json, text/plain, */*',
+                                      'X-Requested-With': 'XMLHttpRequest',
+                                      'Origin': window.location.origin,
+                                      'Referer': window.location.href
+                                  },
                                   credentials: 'include',
                                   body: JSON.stringify({ email: email, magicLink: link })
                               });
