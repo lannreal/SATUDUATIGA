@@ -333,7 +333,7 @@ let currentSession = null;
     await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(() => {});
 
     let checks = 0;
-    const deadline = Date.now() + 120000;
+    const deadline = Date.now() + 240000;
     let cfClearanceFound = false;
 
     while (Date.now() < deadline) {
@@ -372,8 +372,8 @@ let currentSession = null;
         
         page._forceBypass = page._forceBypass || false;
         if ((challenging || !(await isCleanDashboard(page))) && !page._forceBypass) {
-            if (checks > page._cfClearanceCheck && (checks - page._cfClearanceCheck) % 15 === 0) {
-                if (page._reloads < 4) {
+            if (checks > page._cfClearanceCheck && (checks - page._cfClearanceCheck) % 10 === 0) {
+                if (page._reloads < 2) {
                     log.info(`🎯 cf_clearance aktif tapi masih tertahan! Membuka ulang dashboard (Reload #${page._reloads + 1})...`);
                     page._reloads++;
                     await page.goto('https://amprem.irfanjawa.com/dashboard/generator', { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(() => {});
