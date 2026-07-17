@@ -482,6 +482,7 @@ let currentSession = null;
                     let r = await cleanFetch('/api/auth/send-magic-link', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
                         body: JSON.stringify({ email })
                     });
                     let t = await r.text();
@@ -584,6 +585,7 @@ let currentSession = null;
                               const res = await cleanFetch('/api/auth/verify-magic-link', {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
+                                  credentials: 'include',
                                   body: JSON.stringify({ email: email, magicLink: link })
                               });
                               let data = {};
