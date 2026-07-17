@@ -17,7 +17,11 @@ function executeBotAsync(action, args = [], silentMode = false) {
         if (!silentMode) console.log(`${C.cyan}[*] Executing Bot Worker: action=${action}, args=[${args.join(', ')}]${C.reset}`);
         
         const botPath = path.join(__dirname, 'bot.js');
-        const botProcess = spawn('node', [botPath, action, ...args], {
+        const isLinux = process.platform === 'linux';
+        const spawnCmd = isLinux ? 'xvfb-run' : 'node';
+        const spawnArgs = isLinux ? ['--auto-servernum', '--server-args=-screen 0, 1920x1080x24', 'node', botPath, action, ...args] : [botPath, action, ...args];
+        
+        const botProcess = spawn(spawnCmd, spawnArgs, {
             cwd: path.join(__dirname, '..'),
             env: process.env
         });

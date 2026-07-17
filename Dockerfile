@@ -27,5 +27,5 @@ COPY . .
 # Expose API Port
 EXPOSE 3000
 
-# Run as API server by default with Xvfb (Virtual Framebuffer)
-CMD ["xvfb-run", "--auto-servernum", "--server-args=-screen 0, 1920x1080x24", "node", "app.js", "--api"]
+# Run as API server by default
+CMD ["node", "app.js", "--api"]
