@@ -502,7 +502,20 @@ let currentSession = null;
                   log.warn('Fetch diblokir Cloudflare! Menggunakan UI Fallback...');
                   await page.goto('https://amprem.irfanjawa.com/auth', { waitUntil: 'domcontentloaded' }).catch(()=>{});
                   await sleep(2000);
-                  await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+                  
+                  // Handle Turnstile if it appears
+                  for(let i=0; i<3; i++){
+                      if (await isChallenging(page)) await tryClickTurnstile(page);
+                      await sleep(1500);
+                  }
+                  
+                  try {
+                      await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+                  } catch (e) {
+                      const b64 = await page.screenshot({ encoding: 'base64' });
+                      resSend = { error: 'Waiting for email input failed', screenshot: b64 };
+                      throw new Error('UI Fallback failed to find input');
+                  }
                   
                   // Hapus isi input dan ketik email target
                   await page.evaluate(() => document.querySelector('input[type="email"]').value = '');
