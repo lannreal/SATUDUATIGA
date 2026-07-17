@@ -500,6 +500,10 @@ let currentSession = null;
               // Jika fetch terblokir CF (mengembalikan HTML), fallback menggunakan antarmuka UI!
               if (resSend.data && resSend.data.is_html) {
                   log.warn('Fetch diblokir Cloudflare! Menggunakan UI Fallback...');
+                  // Hapus session cookie agar tidak di-redirect ke dashboard saat membuka /auth
+                  await page.deleteCookie({ name: 'session', domain: 'amprem.irfanjawa.com' });
+                  await page.deleteCookie({ name: 'session', domain: '.amprem.irfanjawa.com' });
+                  
                   await page.goto('https://amprem.irfanjawa.com/auth', { waitUntil: 'domcontentloaded' }).catch(()=>{});
                   await sleep(2000);
                   
