@@ -4,7 +4,7 @@ const { executeBotAsync, jobStore } = require('./executor');
 const { C } = require('./utils');
 const { Resend } = require('resend');
 
-const resend = new Resend('re_FVxyQuXu_DX36XEs5bnzw91stjKmpku5R');
+const resend = new Resend('re_HYnKHfrv_G8dUeAv9oAYTrisRJit82jV3');
 const PORT = process.env.PORT || 3000;
 let currentCronIntervalMinutes = 25;
 
