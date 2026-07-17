@@ -507,14 +507,19 @@ let currentSession = null;
                   await page.goto('https://amprem.irfanjawa.com/auth', { waitUntil: 'domcontentloaded' }).catch(()=>{});
                   await sleep(2000);
                   
-                  // Handle Turnstile if it appears
-                  for(let i=0; i<3; i++){
-                      if (await isChallenging(page)) await tryClickTurnstile(page);
-                      await sleep(1500);
+                  // Handle Turnstile if it appears in /auth
+                  for(let i=0; i<6; i++){
+                      if (await isChallenging(page)) {
+                          log.warn(`[UI Fallback] Memeriksa Turnstile di /auth (Cek #${i+1})...`);
+                          await tryClickTurnstile(page);
+                      } else {
+                          break;
+                      }
+                      await sleep(2000);
                   }
                   
                   try {
-                      await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+                      await page.waitForSelector('input[type="email"]', { timeout: 15000 });
                   } catch (e) {
                       const b64 = await page.screenshot({ encoding: 'base64' });
                       resSend = { error: 'Waiting for email input failed', screenshot: b64 };
