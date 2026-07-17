@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  am-generator-api:
+    build: .
+    container_name: am_generator_api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    volumes:
+      # Mount config file to persist session and cf_clearance outside the container
+      - ./config_prem.json:/usr/src/app/config_prem.json

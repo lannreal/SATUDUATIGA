@@ -1,0 +1,28 @@
+{
+  "name": "am-generator-premium-api",
+  "version": "2.0.0",
+  "description": "REST API Server & Automation Engine for AM Generator Premium Bypass & Claim",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js --api",
+    "dev": "node app.js --api",
+    "cli": "node app.js"
+  },
+  "keywords": [
+    "automation",
+    "api",
+    "drissionpage",
+    "bypass"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "proxy-chain": "^3.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "rebrowser-puppeteer": "^24.8.1"
+  }
+}
