@@ -542,7 +542,9 @@ let currentSession = null;
               
             } catch (e) {
               log.error(`Gagal mengirim notifikasi: ${e.message}`);
-              resSend = { error: e.message };
+              if (!resSend.error) {
+                  resSend = { error: e.message };
+              }
             }
             
             fs.writeFileSync(path.join(__dirname, '..', 'res_node.json'), JSON.stringify({ action: "send", res: resSend, cookies: await page.cookies('https://amprem.irfanjawa.com') }), 'utf8');
