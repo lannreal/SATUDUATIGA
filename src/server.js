@@ -1,10 +1,11 @@
+require('dotenv').config();
 const http = require('http');
 const { getConfig, saveConfig } = require('./config');
 const { executeBotAsync, jobStore } = require('./executor');
 const { C } = require('./utils');
 const { Resend } = require('resend');
 
-const resend = new Resend('re_HYnKHfrv_G8dUeAv9oAYTrisRJit82jV3');
+const resend = new Resend(process.env.RESEND_API_KEY);
 const PORT = process.env.PORT || 3000;
 let currentCronIntervalMinutes = 25;
 
