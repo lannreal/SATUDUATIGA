@@ -496,6 +496,33 @@ let currentSession = null;
                     try { return { status: r.status, data: JSON.parse(t) }; } catch(e) { return { status: r.status, data: { is_html: true, error: t.slice(0, 80) } }; }
                 } catch(e) { return { error: e.toString() }; }
               }, emailTarget);
+              
+              // Jika fetch terblokir CF (mengembalikan HTML), fallback menggunakan antarmuka UI!
+              if (resSend.data && resSend.data.is_html) {
+                  log.warn('Fetch diblokir Cloudflare! Menggunakan UI Fallback...');
+                  await page.goto('https://amprem.irfanjawa.com/auth', { waitUntil: 'domcontentloaded' }).catch(()=>{});
+                  await sleep(2000);
+                  await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+                  
+                  // Hapus isi input dan ketik email target
+                  await page.evaluate(() => document.querySelector('input[type="email"]').value = '');
+                  await page.type('input[type="email"]', emailTarget);
+                  await sleep(500);
+                  
+                  // Cari dan klik tombol submit (Kirim link masuk)
+                  const buttons = await page.$$('button[type="submit"], button');
+                  for (const btn of buttons) {
+                      const text = await page.evaluate(el => el.innerText.toLowerCase(), btn);
+                      if (text.includes('link') || text.includes('kirim') || text.includes('masuk') || btn === buttons[0]) {
+                          await btn.click();
+                          break;
+                      }
+                  }
+                  
+                  await sleep(3000); // Tunggu loading pengiriman dari firebase
+                  resSend = { status: 200, data: { success: true, message: 'Dikirim via UI Fallback' } };
+              }
+              
             } catch (e) {
               log.error(`Gagal mengirim notifikasi: ${e.message}`);
               resSend = { error: e.message };
