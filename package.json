@@ -23,6 +23,7 @@
     "proxy-chain": "^3.0.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "rebrowser-puppeteer": "^24.8.1"
+    "rebrowser-puppeteer": "^24.8.1",
+    "resend": "^6.17.2"
   }
 }

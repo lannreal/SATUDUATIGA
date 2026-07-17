@@ -2,6 +2,9 @@ const http = require('http');
 const { getConfig, saveConfig } = require('./config');
 const { executeBotAsync, jobStore } = require('./executor');
 const { C } = require('./utils');
+const { Resend } = require('resend');
+
+const resend = new Resend('re_BCa9yNsz_NVGVUVLsZGZmZ6FusuhZsAzv');
 const PORT = process.env.PORT || 3000;
 let currentCronIntervalMinutes = 25;
 
@@ -154,6 +157,29 @@ function startAPIServer() {
                     const applyData = execution.result?.apply_res?.data || execution.result?.apply_res || {};
                     const isSuccess = execution.result?.success === true || applyData.success === true || (execution.result?.apply_res?.status === 200 && !applyData.error);
                     const codeOrder = applyData.codeOrder || (applyData.data && applyData.data.codeOrder) || (isSuccess ? "VIP-SUCCESS-ACTIVE" : null);
+
+                    if (isSuccess && email && email !== "Akun Terverifikasi") {
+                        console.log(`${C.brightCyan}[EMAIL] Mengirim notifikasi Premium ke ${email}...${C.reset}`);
+                        resend.emails.send({
+                            from: 'AM Generator Premium <onboarding@resend.dev>',
+                            to: email,
+                            subject: '🎉 Selamat! Akun Kamu Sekarang Premium',
+                            html: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
+                                <h2 style="color: #28a745; text-align: center;">Upgrade VIP Berhasil! 💎</h2>
+                                <p>Halo,</p>
+                                <p>Sistem otomatis kami telah sukses melakukan bypass antrean iklan dan secara resmi mengaktifkan status <strong>Premium/VIP</strong> di akun kamu.</p>
+                                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                    <p style="margin: 5px 0;"><strong>📧 Email Akun:</strong> ${email}</p>
+                                    <p style="margin: 5px 0;"><strong>🏷️ Order Code:</strong> ${codeOrder}</p>
+                                </div>
+                                <p>Silakan buka dan login kembali ke dalam aplikasi untuk menikmati semua fitur premium tanpa batasan apa pun.</p>
+                                <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;" />
+                                <p style="font-size: 12px; color: #888; text-align: center;">Pesan ini dikirim secara otomatis oleh AM Generator Bot Automation.<br>API Powered by Resend.</p>
+                            </div>`
+                        }).then(() => console.log(`${C.brightGreen}[EMAIL] Notifikasi sukses terkirim ke ${email}${C.reset}`))
+                          .catch(e => console.error(`${C.red}[EMAIL ERROR] Gagal mengirim ke ${email}: ${e.message}${C.reset}`));
+                    }
+
                     jobStore.set(jobId, {
                         status: isSuccess ? 'done' : 'failed',
                         success: isSuccess, email, action,
