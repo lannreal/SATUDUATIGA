@@ -123,12 +123,20 @@ async function tryClickTurnstile(page) {
               const box = await frameEle.boundingBox();
               log.info(`[FRAME ${i} BOX]: ${JSON.stringify(box)}`);
               if (box && box.width > 10 && box.height > 10) {
-                log.info(`🛡️ Klik tengah iframe Turnstile (frameElement ${Math.round(box.width)}x${Math.round(box.height)} di x=${Math.round(box.x)}, y=${Math.round(box.y)})...`);
-                const targetX = box.x + box.width / 2;
+                log.info(`🛡️ Klik checkbox Turnstile (frameElement ${Math.round(box.width)}x${Math.round(box.height)} di x=${Math.round(box.x)}, y=${Math.round(box.y)})...`);
+                // Targetkan 30px dari kiri (posisi kotak centang) alih-alih di tengah (teks)
+                const targetX = box.x + 30;
                 const targetY = box.y + box.height / 2;
-                await page.mouse.move(targetX, targetY, { steps: 15 });
-                await sleep(350);
+                
+                // Gerakkan kursor dengan sedikit variasi untuk menghindari deteksi
+                await page.mouse.move(targetX + (Math.random() * 5 - 2.5), targetY + (Math.random() * 5 - 2.5), { steps: 20 });
+                await sleep(350 + Math.random() * 200);
                 await page.mouse.click(targetX, targetY);
+                
+                // Coba klik juga di tengah sebagai fallback
+                await sleep(500);
+                await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+                
                 await sleep(1500);
                 return true;
               }
