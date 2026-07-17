@@ -328,6 +328,11 @@ let currentSession = null;
     const TARGET_URL = 'https://amprem.irfanjawa.com/dashboard/generator';
     const fp = pickFingerprint();
     await page.setUserAgent(fp.ua);
+    await page.setExtraHTTPHeaders({
+        'sec-ch-ua': `"Google Chrome";v="${fp.chromeVersion}", "Chromium";v="${fp.chromeVersion}", "Not=A?Brand";v="24"`,
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': `"${fp.secChUaPlatform}"`
+    });
     await hardenFingerprint(page, fp);
     log.info(`Membuka Target Server Utama ...`);
     await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(() => {});
