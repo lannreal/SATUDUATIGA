@@ -215,7 +215,7 @@ async function runSolver() {
     
     // Sticky session to prevent IP rotation
     const sessionId = Math.random().toString(36).substring(2, 10);
-    const oldProxyUrl = `http://user-langood_XQqsN-country-US-session-${sessionId}:z5x=45HzIDl9ceah@dc.oxylabs.io:8000`;
+    const oldProxyUrl = `http://scraperapi:ffe24a20562c72ad79c68dda905812f3@proxy-server.scraperapi.com:8001`;
     // Gunakan konfigurasi proxy-chain khusus untuk menangani HTTPS dan CORS iframe
     newProxyUrl = await proxyChain.anonymizeProxy({ url: oldProxyUrl, port: 0 });
     
