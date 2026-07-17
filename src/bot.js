@@ -213,15 +213,8 @@ async function runSolver() {
     const execPath = getChromeExecutablePath();
     log.info(`Menggunakan Chrome executable: ${execPath}`);
     
-    // Sticky session to prevent IP rotation
-    const sessionId = Math.random().toString(36).substring(2, 10);
-    const oldProxyUrl = `http://scraperapi:ffe24a20562c72ad79c68dda905812f3@proxy-server.scraperapi.com:8001`;
-    // Gunakan konfigurasi proxy-chain khusus untuk menangani HTTPS dan CORS iframe
-    newProxyUrl = await proxyChain.anonymizeProxy({ url: oldProxyUrl, port: 0 });
-    
-    const dynamicArgs = CHROME_ARGS.map(arg => 
-        arg.startsWith('--proxy-server=') ? `--proxy-server=${newProxyUrl}` : arg
-    );
+    // Filter out any proxy configurations to ensure pure VPS IP is used
+    const dynamicArgs = CHROME_ARGS.filter(arg => !arg.startsWith('--proxy-server='));
 
     browser = await puppeteer.launch({
       headless: false,
