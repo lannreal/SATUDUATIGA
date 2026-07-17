@@ -161,7 +161,7 @@ function startAPIServer() {
                     if (isSuccess && email && email !== "Akun Terverifikasi") {
                         console.log(`${C.brightCyan}[EMAIL] Mengirim notifikasi Premium ke ${email}...${C.reset}`);
                         resend.emails.send({
-                            from: 'AM Generator Premium <onboarding@resend.dev>',
+                            from: 'AM Generator Premium <noreply@lanncodex.biz.id>',
                             to: email,
                             subject: '🎉 Selamat! Akun Kamu Sekarang Premium',
                             html: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
@@ -176,8 +176,15 @@ function startAPIServer() {
                                 <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;" />
                                 <p style="font-size: 12px; color: #888; text-align: center;">Pesan ini dikirim secara otomatis oleh AM Generator Bot Automation.<br>API Powered by Resend.</p>
                             </div>`
-                        }).then(() => console.log(`${C.brightGreen}[EMAIL] Notifikasi sukses terkirim ke ${email}${C.reset}`))
-                          .catch(e => console.error(`${C.red}[EMAIL ERROR] Gagal mengirim ke ${email}: ${e.message}${C.reset}`));
+                        }).then((response) => {
+                            if (response.error) {
+                                console.error(`${C.red}[EMAIL ERROR] Gagal mengirim ke ${email}: ${response.error.message}${C.reset}`);
+                            } else {
+                                console.log(`${C.brightGreen}[EMAIL] Notifikasi sukses terkirim ke ${email}${C.reset}`);
+                            }
+                        }).catch(e => {
+                            console.error(`${C.red}[EMAIL ERROR] Exception saat mengirim ke ${email}: ${e.message}${C.reset}`);
+                        });
                     }
 
                     jobStore.set(jobId, {

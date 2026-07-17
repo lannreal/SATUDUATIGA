@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIM ATLAS AUTO VIP - Web Client</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(15, 23, 42, 0.6);
+            color: var(--text-main);
+            font-size: 15px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--primary);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.success {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            display: block;
+        }
+
+        .alert.error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            display: block;
+        }
+        
+        .alert.info {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: block;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a7f3d0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>KIM ATLAS</h1>
+        <p class="subtitle">Auto Bypass & Claim VIP</p>
+
+        <!-- STEP 1: Minta Magic Link -->
+        <div id="step1" class="step active">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Masukkan email Anda" required>
+            </div>
+            <button id="btnSend" onclick="sendMagicLink()">Kirim Magic Link</button>
+        </div>
+
+        <!-- STEP 2: Verifikasi Magic Link -->
+        <div id="step2" class="step">
+            <div class="form-group">
+                <label for="magicLink">Magic Link URL</label>
+                <input type="url" id="magicLink" placeholder="Paste link dari email di sini" required>
+            </div>
+            <button id="btnVerify" onclick="verifyMagicLink()">Verifikasi & Bypass</button>
+        </div>
+
+        <div id="messageBox"></div>
+    </div>
+
+    <script>
+        const BASE_URL = "https://kim-atlas-keyword-prev.trycloudflare.com";
+        let userEmail = "";
+
+        function showMessage(msg, type, details = null) {
+            const box = document.getElementById('messageBox');
+            box.innerHTML = `<div class="alert ${type}">${msg}</div>`;
+            if (details) {
+                box.innerHTML += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+        }
+
+        function setLoading(btnId, isLoading, text) {
+            const btn = document.getElementById(btnId);
+            btn.disabled = isLoading;
+            btn.innerText = isLoading ? "Loading..." : text;
+        }
+
+        async function sendMagicLink() {
+            const emailInput = document.getElementById('email').value.trim();
+            if (!emailInput) {
+                showMessage("Email tidak boleh kosong!", "error");
+                return;
+            }
+
+            userEmail = emailInput;
+            setLoading('btnSend', true, 'Kirim Magic Link');
+            showMessage("Mengirim request ke server...", "info");
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail })
+                });
+
+                let result;
+                try { result = await response.json(); } 
+                catch (e) { result = await response.text(); }
+
+                if (response.ok) {
+                    showMessage("Berhasil! Silakan cek email Anda untuk Magic Link.", "success");
+                    // Pindah ke step 2
+                    setTimeout(() => {
+                        document.getElementById('step1').classList.remove('active');
+                        document.getElementById('step2').classList.add('active');
+                        document.getElementById('messageBox').innerHTML = ''; // bersihkan pesan
+                    }, 2000);
+                } else {
+                    showMessage("Gagal meminta magic link.", "error", result);
+                }
+            } catch (error) {
+                showMessage(`Terjadi kesalahan: ${error.message}`, "error");
+            } finally {
+                setLoading('btnSend', false, 'Kirim Magic Link');
+            }
+        }
+
+        async function verifyMagicLink() {
+            const linkInput = document.getElementById('magicLink').value.trim();
+            if (!linkInput) {
+                showMessage("Magic Link tidak boleh kosong!", "error");
+                return;
+            }
+
+            setLoading('btnVerify', true, 'Verifikasi & Bypass');
+            showMessage("Sedang memproses bypass iklan, mohon tunggu...", "info");
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, magicLink: linkInput })
+                });
+
+                let result;
+                try { result = await response.json(); } 
+                catch (e) { result = await response.text(); }
+
+                if (response.ok) {
+                    showMessage("VERIFIKASI BERHASIL! VIP telah diklaim.", "success", result);
+                } else {
+                    showMessage("VERIFIKASI GAGAL!", "error", result);
+                }
+            } catch (error) {
+                showMessage(`Terjadi kesalahan jaringan/sistem: ${error.message}`, "error");
+            } finally {
+                setLoading('btnVerify', false, 'Verifikasi & Bypass');
+            }
+        }
+    </script>
+</body>
+</html>
