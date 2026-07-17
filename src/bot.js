@@ -524,29 +524,66 @@ let currentSession = null;
                   
                   try {
                       await page.waitForSelector('input[type="email"]', { timeout: 15000 });
+                      
+                      // Hapus isi input dan ketik email target
+                      await page.evaluate(() => document.querySelector('input[type="email"]').value = '');
+                      await page.type('input[type="email"]', emailTarget);
+                      await sleep(500);
+                      
+                      // Cari dan klik tombol submit (Kirim link masuk)
+                      const buttons = await page.$$('button[type="submit"], button');
+                      for (const btn of buttons) {
+                          const text = await page.evaluate(el => el.innerText.toLowerCase(), btn);
+                          if (text.includes('link') || text.includes('kirim') || text.includes('masuk') || btn === buttons[0]) {
+                              await btn.click();
+                              break;
+                          }
+                      }
+                      
+                      await sleep(3000); // Tunggu loading pengiriman dari firebase
+                      resSend = { status: 200, data: { success: true, message: 'Dikirim via UI Fallback' } };
                   } catch (e) {
-                      const b64 = await page.screenshot({ encoding: 'base64' });
-                      resSend = { error: 'Waiting for email input failed', screenshot: b64 };
-                      throw new Error('UI Fallback failed to find input');
-                  }
-                  
-                  // Hapus isi input dan ketik email target
-                  await page.evaluate(() => document.querySelector('input[type="email"]').value = '');
-                  await page.type('input[type="email"]', emailTarget);
-                  await sleep(500);
-                  
-                  // Cari dan klik tombol submit (Kirim link masuk)
-                  const buttons = await page.$$('button[type="submit"], button');
-                  for (const btn of buttons) {
-                      const text = await page.evaluate(el => el.innerText.toLowerCase(), btn);
-                      if (text.includes('link') || text.includes('kirim') || text.includes('masuk') || btn === buttons[0]) {
-                          await btn.click();
-                          break;
+                      log.warn('UI Fallback masih terblokir Cloudflare! Menggunakan REST API Firebase Mutlak...');
+                      const htmlContent = await page.content();
+                      const match = htmlContent.match(/apiKey[\"']?\s*:\s*[\"']([^\"']+)[\"']/i);
+                      if (match && match[1]) {
+                          const fbApiKey = match[1];
+                          const fbUrl = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${fbApiKey}`;
+                          const fbPayload = {
+                              requestType: "EMAIL_SIGNIN",
+                              email: emailTarget,
+                              continueUrl: "https://amprem.irfanjawa.com/auth"
+                          };
+                          
+                          // Execute fetch from node context, completely bypassing CF
+                          const fbRes = await page.evaluate(async (url, payload) => {
+                              try {
+                                  const r = await fetch(url, {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify(payload)
+                                  });
+                                  const d = await r.json();
+                                  return { status: r.status, data: d };
+                              } catch(err) {
+                                  return { error: err.message };
+                              }
+                          }, fbUrl, fbPayload);
+                          
+                          if (fbRes.status === 200) {
+                              log.success('Magic link berhasil dikirim via Firebase REST API!');
+                              resSend = { status: 200, data: { success: true, message: 'Dikirim via Firebase REST API Mutlak' } };
+                          } else {
+                              const b64 = await page.screenshot({ encoding: 'base64' });
+                              resSend = { error: 'Firebase REST API failed', screenshot: b64, fbData: fbRes.data };
+                              throw new Error('Firebase REST API failed');
+                          }
+                      } else {
+                          const b64 = await page.screenshot({ encoding: 'base64' });
+                          resSend = { error: 'Waiting for email input failed and Firebase Key not found', screenshot: b64 };
+                          throw new Error('UI Fallback failed and no API key found');
                       }
                   }
-                  
-                  await sleep(3000); // Tunggu loading pengiriman dari firebase
-                  resSend = { status: 200, data: { success: true, message: 'Dikirim via UI Fallback' } };
               }
               
             } catch (e) {
